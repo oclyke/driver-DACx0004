@@ -187,9 +187,9 @@ dacx0004_status_e dacx0004_ldac_pulse(dacx0004_dev_t* pdev){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(pdev->_if->set_ldac == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
-  dacx0004_status_e ret = pdev->_if->set_ldac(true, pdev->_arg);
+  dacx0004_status_e ret = pdev->_if->set_ldac(false, pdev->_arg);
   if(ret != DACX0004_STAT_OK){ return ret; }
-  return pdev->_if->set_ldac(false, pdev->_arg);
+  return pdev->_if->set_ldac(true, pdev->_arg);
 }
 
 dacx0004_status_e dacx0004_clr_pulse(dacx0004_dev_t* pdev){
