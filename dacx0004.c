@@ -163,6 +163,44 @@ dacx0004_status_e dacx0004_read_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, dacx0
   return DACX0004_STAT_OK;
 }
 
+dacx0004_status_e dacx0004_software_reset(dacx0004_dev_t* pdev){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_SOFTWARE_RESET, .add = 0, .dat = 0, .mod = 0 };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_software_clear(dacx0004_dev_t* pdev){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_SOFTWARE_CLEAR, .add = 0, .dat = 0, .mod = 0 };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_set_power(dacx0004_dev_t* pdev, dacx0004_add_e channel, dacx0004_pwr_e mode){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_PWRnc, .add = channel, .dat = 0, .mod = (uint8_t)mode };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_set_clear_mode(dacx0004_dev_t* pdev, dacx0004_clm_e mode){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_CLEAR_MODE_REG, .add = 0, .dat = 0, .mod = (uint8_t)mode };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_ldac_pulse(dacx0004_dev_t* pdev){
+  if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if->set_ldac == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  dacx0004_status_e ret = pdev->_if->set_ldac(true, pdev->_arg);
+  if(ret != DACX0004_STAT_OK){ return ret; }
+  return pdev->_if->set_ldac(false, pdev->_arg);
+}
+
+dacx0004_status_e dacx0004_clr_pulse(dacx0004_dev_t* pdev){
+  if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if->set_clr == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  dacx0004_status_e ret = pdev->_if->set_clr(false, pdev->_arg);
+  if(ret != DACX0004_STAT_OK){ return ret; }
+  return pdev->_if->set_clr(true, pdev->_arg);
+}
+
 dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(dest == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
