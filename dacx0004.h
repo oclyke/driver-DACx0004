@@ -135,4 +135,12 @@ dacx0004_status_e dacx0004_write_channel(dacx0004_dev_t* pdev, dacx0004_add_e ch
 dacx0004_status_e dacx0004_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel);                         // transfer input register to DAC output register
 dacx0004_status_e dacx0004_write_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value);   // write value and immediately update DAC output
 
+// Control helpers
+dacx0004_status_e dacx0004_software_reset(dacx0004_dev_t* pdev);                                             // send software reset command (restores power-on defaults)
+dacx0004_status_e dacx0004_software_clear(dacx0004_dev_t* pdev);                                             // send software clear command (applies clear-mode to all DAC outputs)
+dacx0004_status_e dacx0004_set_power(dacx0004_dev_t* pdev, dacx0004_add_e channel, dacx0004_pwr_e mode);     // configure power-down mode for a channel
+dacx0004_status_e dacx0004_set_clear_mode(dacx0004_dev_t* pdev, dacx0004_clm_e mode);                        // configure what value DAC outputs take when cleared
+dacx0004_status_e dacx0004_ldac_pulse(dacx0004_dev_t* pdev);                                                  // pulse LDAC low to simultaneously update all DAC outputs (hardware LDAC)
+dacx0004_status_e dacx0004_clr_pulse(dacx0004_dev_t* pdev);                                                   // pulse CLR low to clear all DAC outputs to the configured clear-mode value
+
 #endif // _DACX0004_H_
