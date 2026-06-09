@@ -33,27 +33,28 @@ dacx0004_if_t dax_if_esp32 = {
 };
 
 dacx0004_status_e dacx0004_esp32_shift_sr(uint8_t* pdat, uint32_t len, void* arg){
-  //if(arg == NULL){ return DACX0004_STAT_ERR; }
-  static bool sr_initialized = false;
   dax_if_esp32_arg_t* if_args = (dax_if_esp32_arg_t*)arg;
-  esp_err_t ret = ESP_OK;
-  const uint8_t xfer_size = 4;    // DACX0004 requires 32-bit transfers
-  spi_transaction_t trans = {     // Configure common transaction settings (also ensures that the transfer is zero-initialized in other entries)
-    .length = xfer_size*8,      
-  };
-  if(!sr_initialized){
+  const uint8_t xfer_size = 4;
+
+  if(len % xfer_size != 0){ return DACX0004_STAT_ERR_INVALID_ARG; }
+
+  if(if_args->spi == NULL){
     spi_device_interface_config_t devcfg={
         .clock_speed_hz = if_args->clk_freq,
-        .mode = 2,                                // SPI mode 2                 
-        .spics_io_num = if_args->sync_pin,        // Let ESP32 SPI driver handle SYNC line
+        .mode = 2,
+        .spics_io_num = if_args->sync_pin,
         .queue_size = if_args->spi_q_size,
     };
     spi_bus_add_device(if_args->host, &devcfg, &(if_args->spi));
-    sr_initialized = true;
   }
-  for(uint32_t ux = 0; ux < (len/xfer_size); ux++){                         // handle all full sized transactions from pdat
-    trans.tx_buffer = (void*)(pdat + (ux*xfer_size));                       // offset tx_buffer for this transfer
-    ret |= spi_device_queue_trans(if_args->spi, &trans, portMAX_DELAY);     // queue all transactions
+
+  esp_err_t ret = ESP_OK;
+  for(uint32_t ux = 0; ux < (len / xfer_size); ux++){
+    spi_transaction_t trans = {
+      .length    = xfer_size * 8,
+      .tx_buffer = (void*)(pdat + (ux * xfer_size)),
+    };
+    ret |= spi_device_polling_transmit(if_args->spi, &trans);
   }
 
   return (ret == ESP_OK) ? DACX0004_STAT_OK : DACX0004_STAT_ERR;
