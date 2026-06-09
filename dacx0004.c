@@ -56,8 +56,7 @@ dacx0004_status_e dacx0004_init_dev(dacx0004_dev_t* pdev, dacx0004_ver_e ver, da
 dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
-
-  dacx0004_status_e retval = DACX0004_STAT_OK;
+  if(pdev->_if->shift_sr == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
 
   const uint8_t len = 4;
   uint8_t dat[len];
@@ -84,9 +83,7 @@ dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr){
       break;
   }
 
-  retval |= pdev->_if->shift_sr(dat, len, pdev->_arg);
-
-  return retval;
+  return pdev->_if->shift_sr(dat, len, pdev->_arg);
 }
 
 dacx0004_status_e dacx0004_write_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value){
