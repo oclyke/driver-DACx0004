@@ -30,7 +30,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 #define DAC60004_DAT2(sr) ((uint8_t)( (((uint16_t)sr.dat & 0x00FF) >> 0) ))
 
 #define DAC80004_DAT3(sr) ((uint8_t)( (((uint16_t)sr.dat & 0x000F) << 4) | ((sr.mod & 0x0F) << 0) ))
-#define DAC70004_DAT3(sr) ((uint8_t)( (((uint16_t)sr.dat & 0x0003) << 4) | ((sr.mod & 0x0F) << 0) ))
+#define DAC70004_DAT3(sr) ((uint8_t)( (((uint16_t)sr.dat & 0x0003) << 6) | ((sr.mod & 0x0F) << 0) ))
 #define DAC60004_DAT3(sr) ((uint8_t)( (        ( 0x00 << 0)              | ((sr.mod & 0x0F) << 0) )))
 
 
