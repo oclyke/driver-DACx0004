@@ -47,6 +47,7 @@ typedef enum {
     DACX0004_ADD_A = 0x00,
     DACX0004_ADD_B,
     DACX0004_ADD_C,
+    DACX0004_ADD_D,
     DACX0004_ADD_ALL = 0x0F,
 
     DACX0004_ADD_NUM
