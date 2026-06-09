@@ -124,7 +124,12 @@ typedef struct {
 }dacx0004_sr_t;          // command shift register map
 
 dacx0004_status_e dacx0004_init_dev(dacx0004_dev_t* pdev, dacx0004_ver_e ver, dacx0004_if_t* pif, void* arg);
-dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr);  
+dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr);
 dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len);    // fills a buffer 'dest' with the 4-byte sr representation for len bytes. sr will be truncated and repeated as necessary
+
+// High-level channel helpers
+dacx0004_status_e dacx0004_write_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value);          // write value to input register (DAC output unchanged until update)
+dacx0004_status_e dacx0004_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel);                         // transfer input register to DAC output register
+dacx0004_status_e dacx0004_write_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value);   // write value and immediately update DAC output
 
 #endif // _DACX0004_H_

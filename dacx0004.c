@@ -89,6 +89,21 @@ dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr){
   return retval;
 }
 
+dacx0004_status_e dacx0004_write_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_WRITEn, .add = channel, .dat = value, .mod = 0 };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_UPDATEn, .add = channel, .dat = 0, .mod = 0 };
+  return dacx0004_write_sr(pdev, sr);
+}
+
+dacx0004_status_e dacx0004_write_update_channel(dacx0004_dev_t* pdev, dacx0004_add_e channel, uint16_t value){
+  dacx0004_sr_t sr = { .Rw = DACX0004_RW_WRITE, .cmd = DACX0004_CMD_WRITEn_UPDATEn, .add = channel, .dat = value, .mod = 0 };
+  return dacx0004_write_sr(pdev, sr);
+}
+
 dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(dest == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
