@@ -53,7 +53,7 @@ dacx0004_status_e dacx0004_init_dev(dacx0004_dev_t* pdev, dacx0004_ver_e ver, da
 }
 
 
-dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, da80004_sr_t sr){
+dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
 
@@ -89,7 +89,7 @@ dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, da80004_sr_t sr){
   return retval;
 }
 
-dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, da80004_sr_t sr, uint8_t* dest, uint32_t len){
+dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(dest == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
 

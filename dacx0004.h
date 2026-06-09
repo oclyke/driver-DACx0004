@@ -119,12 +119,12 @@ typedef struct {
   uint8_t     Rw  :  1;   // d28      : Rw set 1 for R or 0 for w
   uint8_t     cmd :  4;   // d27-d24  : command
   uint8_t     add :  4;   // d23-d20  : channel address
-  uint16_t    dat : 16;   // d16-d4   : data field for command
+  uint16_t    dat : 16;   // d19-d4   : data field for command
   uint8_t     mod :  4;   // d3-d0    : mode
-}da80004_sr_t;          // command shift register map
+}dacx0004_sr_t;          // command shift register map
 
 dacx0004_status_e dacx0004_init_dev(dacx0004_dev_t* pdev, dacx0004_ver_e ver, dacx0004_if_t* pif, void* arg);
-dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, da80004_sr_t sr);  
-dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, da80004_sr_t sr, uint8_t* dest, uint32_t len);    // fills a buffer 'dest' with the 4-byte sr representation for len bytes. sr will be truncated and repeated as necessary
+dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr);  
+dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len);    // fills a buffer 'dest' with the 4-byte sr representation for len bytes. sr will be truncated and repeated as necessary
 
 #endif // _DACX0004_H_
