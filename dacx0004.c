@@ -101,6 +101,68 @@ dacx0004_status_e dacx0004_write_update_channel(dacx0004_dev_t* pdev, dacx0004_a
   return dacx0004_write_sr(pdev, sr);
 }
 
+dacx0004_status_e dacx0004_read_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, dacx0004_sr_t* result){
+  if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(pdev->_if->shift_sr_rw == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+  if(result == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
+
+  const uint8_t len = 4;
+  uint8_t tx[len];
+  uint8_t rx[len];
+
+  sr.Rw = DACX0004_RW_READ;
+  tx[0] = DACX0004_DAT0(sr);
+  switch(pdev->_ver){
+    case DAC80004:
+      tx[1] = DAC80004_DAT1(sr);
+      tx[2] = DAC80004_DAT2(sr);
+      tx[3] = DAC80004_DAT3(sr);
+      break;
+    case DAC70004:
+      tx[1] = DAC70004_DAT1(sr);
+      tx[2] = DAC70004_DAT2(sr);
+      tx[3] = DAC70004_DAT3(sr);
+      break;
+    case DAC60004:
+      tx[1] = DAC60004_DAT1(sr);
+      tx[2] = DAC60004_DAT2(sr);
+      tx[3] = DAC60004_DAT3(sr);
+      break;
+    default:
+      return DACX0004_STAT_ERR_UNKNOWN_VER;
+  }
+
+  dacx0004_status_e ret = pdev->_if->shift_sr_rw(tx, rx, len, pdev->_arg);
+  if(ret != DACX0004_STAT_OK){ return ret; }
+
+  result->_dc = 0;
+  result->Rw  = (rx[0] >> 4) & 0x01;
+  result->cmd = (rx[0] >> 0) & 0x0F;
+  result->add = (rx[1] >> 4) & 0x0F;
+  result->mod = (rx[3] >> 0) & 0x0F;
+  switch(pdev->_ver){
+    case DAC80004:
+      result->dat = ((uint16_t)(rx[1] & 0x0F) << 12) |
+                    ((uint16_t) rx[2]          <<  4) |
+                    ((uint16_t)(rx[3] >>    4) &  0x0F);
+      break;
+    case DAC70004:
+      result->dat = ((uint16_t)(rx[1] & 0x0F) << 10) |
+                    ((uint16_t) rx[2]          <<  2) |
+                    ((uint16_t)(rx[3] >>    6) &  0x03);
+      break;
+    case DAC60004:
+      result->dat = ((uint16_t)(rx[1] & 0x0F) <<  8) |
+                    ((uint16_t) rx[2]);
+      break;
+    default:
+      return DACX0004_STAT_ERR_UNKNOWN_VER;
+  }
+
+  return DACX0004_STAT_OK;
+}
+
 dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len){
   if(pdev == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
   if(dest == NULL){ return DACX0004_STAT_ERR_INVALID_ARG; }
