@@ -103,10 +103,11 @@ typedef enum {
 // Type Definitions
 
 typedef struct _dacx0004_if_t {
-  dacx0004_status_e (*shift_sr)  (uint8_t* pdat, uint32_t len, void* arg); // required. shift out len bytes from pdat array on the SCLK and SDIN (DACX0004 perspective) lines, use SYNC line to select the device
-  dacx0004_status_e (*set_sync)  (bool lvl, void* arg);                    // optional. set the level of the sync line (true for high, false for low) (only used at startup to deselect the device - after which the shift_sr function should handle the SYNC line)
-  dacx0004_status_e (*set_ldac)  (bool lvl, void* arg);                    // optional. set the level of the ldac line (true for high, false for low) (if not implemented the SYNC line should be tied low)
-  dacx0004_status_e (*set_clr)   (bool lvl, void* arg);                    // optional. set the level of the  clr line (true for high, false for low) (if not implemented the CLR line should be tied high)
+  dacx0004_status_e (*shift_sr)    (uint8_t* pdat, uint32_t len, void* arg);                  // required. shift out len bytes from pdat array on the SCLK and SDIN (DACX0004 perspective) lines, use SYNC line to select the device
+  dacx0004_status_e (*shift_sr_rw) (uint8_t* tx, uint8_t* rx, uint32_t len, void* arg);      // optional. full-duplex transfer: shift out tx and simultaneously capture rx (required for dacx0004_read_sr)
+  dacx0004_status_e (*set_sync)    (bool lvl, void* arg);                                     // optional. set the level of the sync line (true for high, false for low) (only used at startup to deselect the device - after which the shift_sr function should handle the SYNC line)
+  dacx0004_status_e (*set_ldac)    (bool lvl, void* arg);                                     // optional. set the level of the ldac line (true for high, false for low) (if not implemented the SYNC line should be tied low)
+  dacx0004_status_e (*set_clr)     (bool lvl, void* arg);                                     // optional. set the level of the  clr line (true for high, false for low) (if not implemented the CLR line should be tied high)
 } dacx0004_if_t;       // interface abstraction
 
 typedef struct _dacx0004_dev_t {
@@ -126,6 +127,7 @@ typedef struct {
 
 dacx0004_status_e dacx0004_init_dev(dacx0004_dev_t* pdev, dacx0004_ver_e ver, dacx0004_if_t* pif, void* arg);
 dacx0004_status_e dacx0004_write_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr);
+dacx0004_status_e dacx0004_read_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, dacx0004_sr_t* result);   // full-duplex read: sends sr with R/W=1, decodes the simultaneous SDO response into result (requires shift_sr_rw)
 dacx0004_status_e dacx0004_format_sr(dacx0004_dev_t* pdev, dacx0004_sr_t sr, uint8_t* dest, uint32_t len);    // fills a buffer 'dest' with the 4-byte sr representation for len bytes. sr will be truncated and repeated as necessary
 
 // High-level channel helpers

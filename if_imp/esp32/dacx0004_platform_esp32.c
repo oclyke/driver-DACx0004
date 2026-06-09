@@ -21,15 +21,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 // ESP32-specific interface functions for the DACX0004
 dacx0004_status_e dacx0004_esp32_shift_sr(uint8_t* pdat, uint32_t len, void* arg);
+dacx0004_status_e dacx0004_esp32_shift_sr_rw(uint8_t* tx, uint8_t* rx, uint32_t len, void* arg);
 dacx0004_status_e dacx0004_esp32_set_sync(bool lvl, void* arg);
 dacx0004_status_e dacx0004_esp32_set_ldac(bool lvl, void* arg);
 dacx0004_status_e dacx0004_esp32_set_clr(bool lvl, void* arg);
 
 dacx0004_if_t dax_if_esp32 = {
-  .shift_sr = dacx0004_esp32_shift_sr,
-  .set_sync = NULL,                     // sync is handled by SPI master
-  .set_ldac = dacx0004_esp32_set_ldac,
-  .set_clr = dacx0004_esp32_set_clr,
+  .shift_sr    = dacx0004_esp32_shift_sr,
+  .shift_sr_rw = dacx0004_esp32_shift_sr_rw,
+  .set_sync    = NULL,                      // sync is handled by SPI master
+  .set_ldac    = dacx0004_esp32_set_ldac,
+  .set_clr     = dacx0004_esp32_set_clr,
 };
 
 dacx0004_status_e dacx0004_esp32_shift_sr(uint8_t* pdat, uint32_t len, void* arg){
@@ -57,6 +59,32 @@ dacx0004_status_e dacx0004_esp32_shift_sr(uint8_t* pdat, uint32_t len, void* arg
     ret |= spi_device_polling_transmit(if_args->spi, &trans);
   }
 
+  return (ret == ESP_OK) ? DACX0004_STAT_OK : DACX0004_STAT_ERR;
+}
+
+dacx0004_status_e dacx0004_esp32_shift_sr_rw(uint8_t* tx, uint8_t* rx, uint32_t len, void* arg){
+  static bool sr_rw_initialized = false;
+  dax_if_esp32_arg_t* if_args = (dax_if_esp32_arg_t*)arg;
+  esp_err_t ret = ESP_OK;
+  const uint8_t xfer_size = 4;
+  spi_transaction_t trans = {
+    .length = xfer_size * 8,
+  };
+  if(!sr_rw_initialized){
+    spi_device_interface_config_t devcfg={
+        .clock_speed_hz = if_args->clk_freq,
+        .mode = 2,
+        .spics_io_num = if_args->sync_pin,
+        .queue_size = if_args->spi_q_size,
+    };
+    spi_bus_add_device(if_args->host, &devcfg, &(if_args->spi));
+    sr_rw_initialized = true;
+  }
+  for(uint32_t ux = 0; ux < (len / xfer_size); ux++){
+    trans.tx_buffer = (void*)(tx + (ux * xfer_size));
+    trans.rx_buffer = (void*)(rx + (ux * xfer_size));
+    ret |= spi_device_polling_transmit(if_args->spi, &trans);
+  }
   return (ret == ESP_OK) ? DACX0004_STAT_OK : DACX0004_STAT_ERR;
 }
 
