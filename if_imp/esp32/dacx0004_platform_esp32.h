@@ -78,7 +78,7 @@ dax_if_esp32_arg_t  if_args = {
     .clk_pin = PIN_NUM_CLK,
     .clk_freq = CLOCK_FREQ,
 };
-da80004_sr_t sr = {
+dacx0004_sr_t sr = {
     .Rw = DACX0004_RW_WRITE,
     .cmd = DACX0004_CMD_WRITEn_UPDATEn,
     .add = DACX0004_ADD_A,
